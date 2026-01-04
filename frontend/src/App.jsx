@@ -1,5 +1,5 @@
 import './App.css'
-import { SignedOut, SignInButton , SignOutButton , SignedIn } from '@clerk/clerk-react'
+import { SignedOut, SignInButton , SignOutButton, UserButton , SignedIn } from '@clerk/clerk-react'
 
 function App() {
   

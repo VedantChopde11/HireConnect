@@ -10,7 +10,8 @@ import { inngest } from "./lib/inngest.js"
 import { serve } from "inngest/express";
 import { functions } from "./lib/inngest.js"
 import { protectRoute } from "./middleware/protectRoute.js"
-import router from "./routes/chatRoutes.js"
+import chatRoutes from "./routes/chatRoutes.js"
+import sessionRoutes from "./routes/sessionRoutes.js"
 
 
 const app = express()
@@ -41,7 +42,8 @@ app.get("/video-calls", protectRoute , (req,res) => {
     res.status(200).json({msg:"this is a protected route"})
 })
 
-app.get("/api/chat" , router)
+app.get("/api/chat" , chatRoutes)
+app.get("/api/sessions" , sessionRoutes)
 
 
 

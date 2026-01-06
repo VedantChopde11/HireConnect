@@ -42,8 +42,8 @@ app.get("/video-calls", protectRoute , (req,res) => {
     res.status(200).json({msg:"this is a protected route"})
 })
 
-app.get("/api/chat" , chatRoutes)
-app.get("/api/sessions" , sessionRoutes)
+app.use("/api/chat" , chatRoutes)
+app.use("/api/sessions" , sessionRoutes)
 
 
 

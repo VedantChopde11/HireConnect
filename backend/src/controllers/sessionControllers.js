@@ -8,7 +8,7 @@ export async function createSession(req,res) {
         const clerkId = req.user.clerkId
 
         if(!problem || !difficulty) {
-            return res.this.status(400).json({msg:"Problem ans Difficulty are required"})
+            return res.status(400).json({msg:"Problem ans Difficulty are required"})
         }
 
         // generate a unique call id for stream video

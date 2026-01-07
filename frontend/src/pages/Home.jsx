@@ -1,5 +1,5 @@
 import { Link } from "react-router"
-import { SparkleIcon , ZapIcon , CheckIcon , VideoIcon , ArrowRightIcon, Code2Icon } from "lucide-react"
+import { SparkleIcon , ZapIcon , CheckIcon , VideoIcon , ArrowRightIcon, Code2Icon , UsersIcon } from "lucide-react"
 import { SignInButton } from "@clerk/clerk-react"
 
 

@@ -1,7 +1,8 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
+import { Link } from 'react-router'
 import {PROBLEMS} from '../data/problems'
-import { Code2Icon } from 'lucide-react'
+import { Code2Icon  } from 'lucide-react'
 import { getDifficultyBadgeClass } from '../lib/utils'
 
 const Dashboard = () => {

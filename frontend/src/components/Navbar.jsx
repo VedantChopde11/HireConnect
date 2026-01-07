@@ -1,6 +1,6 @@
 import React from 'react'
 import { useLocation , Link } from 'react-router'
-import { BookOpenIcon, LayoutDashboardIcon } from 'lucide-react'
+import { BookOpenIcon, LayoutDashboardIcon , SparkleIcon } from 'lucide-react'
 import { UserButton } from '@clerk/clerk-react'
 
 const Navbar = () => {

@@ -15,7 +15,7 @@ const LANGUAGE_VERSIONS = {
 // @param {String} code - source code to executed 
 // @returns {promise<{success:Boolean, output?:String, error>:string}>}
 
-export async function executeCode(language , code) {
+export const executeCode = async(language , code) => {
     try {
         const languageConfig = LANGUAGE_VERSIONS[language]
         if(!languageConfig) {

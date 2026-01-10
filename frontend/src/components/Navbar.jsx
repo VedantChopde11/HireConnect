@@ -3,10 +3,11 @@ import { useLocation , Link } from 'react-router'
 import { BookOpenIcon, LayoutDashboardIcon , SparkleIcon } from 'lucide-react'
 import { UserButton } from '@clerk/clerk-react'
 
+
 const Navbar = () => {
 
     const location = useLocation()
-    console.log(location)
+    
 
     const isActive = (path) => location.pathname === path
 
@@ -17,7 +18,8 @@ const Navbar = () => {
             <Link to={"/"}
             className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
                 <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
-                    <SparkleIcon className="size-6 text-white" />
+                    
+                    <img src="/HireConnectLogo.png" alt="HireConnect" className="size-6 text-white" />
                 </div>
 
                 <div className="flex flex-col">
@@ -25,7 +27,7 @@ const Navbar = () => {
                         HireConnect
                     </span>
                     <span className="text-xs text-base-content/60 font-medium -mt-1">
-                        Code Together
+                        Linking Ambition to Action
                     </span>
 
                 </div>

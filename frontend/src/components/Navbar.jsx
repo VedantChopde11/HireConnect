@@ -17,7 +17,7 @@ const Navbar = () => {
             {/* LOGO */}
             <Link to={"/"}
             className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
-                <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
+                <div className="size rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
                     
                     <img src="/HireConnectLogo.png" alt="HireConnect" className="size-6 text-white" />
                 </div>

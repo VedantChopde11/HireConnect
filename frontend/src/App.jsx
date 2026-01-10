@@ -7,6 +7,7 @@ import Problems from './pages/Problems'
 import { Toaster } from 'react-hot-toast'
 import Dashboard from './pages/Dashboard'
 import Problem from './pages/Problem'
+import Session from './pages/Session'
 
 function App() {
 
@@ -29,6 +30,11 @@ function App() {
         <Route
           path="/problem/:id"
           element={isSignedIn ? <Problem /> : <Navigate to={"/"} />}
+        />
+
+        <Route
+          path="/session/:id"
+          element={isSignedIn ? <Session /> : <Navigate to={"/"} />}
         />
       </Routes>
 

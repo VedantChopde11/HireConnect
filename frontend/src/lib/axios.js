@@ -1,5 +1,5 @@
 import axios from "axios"
-import { getAuth } from "@clerk/clerk-react";
+import { getAuth } from "@clerk/clerk-react"
 
 
 const axiosInstance = axios.create({

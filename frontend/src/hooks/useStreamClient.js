@@ -76,7 +76,7 @@ const useStreamClient = (session, loadingSession, isHost, isParticipant) => {
         } catch (error) {
           console.error("Cleanup error:", error);
         }
-      })();
+      });
     };
     }, [session, loadingSession, isHost, isParticipant]);
 

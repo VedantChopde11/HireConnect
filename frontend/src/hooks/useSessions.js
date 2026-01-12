@@ -1,8 +1,12 @@
 import {useMutation , useQuery} from "@tanstack/react-query"
 import toast from "react-hot-toast"
 import { sessionApi } from "../api/sessions"
+import { useNavigate } from "react-router"
+
+const navigate = useNavigate()
 
 export const useCreateSession = () => {
+    
     const result = useMutation({
         mutationKey: ["createSession"],
         mutationFn: sessionApi.createSession,
@@ -13,9 +17,9 @@ export const useCreateSession = () => {
         },
         onError: (error) => {
              console.log(error)
-        toast.error(
+            toast.error(
            
-          error.response?.data?.message || "Failed to create room"
+                error.response?.data?.message || "Failed to create room"
           
         )}
 

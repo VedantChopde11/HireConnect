@@ -19,7 +19,7 @@ const Navbar = () => {
             className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
                 <div className="size rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
                     
-                    <img src="/HireConnectLogo.png" alt="HireConnect" className="size-6 text-white" />
+                    <img src="/logo.png" alt="HireConnect" className="size-6 text-white" />
                 </div>
 
                 <div className="flex flex-col">

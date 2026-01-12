@@ -35,7 +35,11 @@ const Dashboard = () => {
           setShowCreateModal(false);
           navigate(`/session/${data.session._id}`);
         },
-      }
+        onError: (error) => {
+        toast.error(
+          error.response?.data?.message || "Failed to create room"
+        )}
+      },
     );
   };
 

@@ -11,7 +11,7 @@ const WelcomeSection = ({ onCreateSession }) => {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <img src="/HireConnectLogo.png" alt="hireconnect" className="w-6 h-6 text-white" />
+                <SparklesIcon className="w-6 h-6 text-white" />
               </div>
               <h1 className="text-5xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 Welcome back, {user?.firstName || "there"}!

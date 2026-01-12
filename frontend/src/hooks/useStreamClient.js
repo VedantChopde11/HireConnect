@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { sessionApi } from '../api/sessions'
 import { StreamChat } from "stream-chat";
 import { disconnectStreamClient, initializeStreamClient } from '../lib/stream'

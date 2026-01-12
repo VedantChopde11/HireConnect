@@ -70,6 +70,73 @@ const Session = () => {
     }
   }, [problemData, selectedLanguage]);
 
+  useEffect(() => {
+    if (!channel) return;
+
+    const handler = (event) => {
+      if (event.type === "code_updated") {
+        setCode(event.code);
+      }
+    };
+
+    channel.on(handler);
+    return () => channel.off(handler);
+  }, [channel]);
+
+  useEffect(() => {
+    if (!channel) return;
+
+    const handler = (event) => {
+      if (event.type === "language_changed") {
+        setSelectedLanguage(event.language);
+        setCode(event.code);
+        setOutput(null);
+      }
+    };
+
+    channel.on(handler);
+    return () => channel.off(handler);
+  }, [channel]);
+
+  useEffect(() => {
+    if (!channel) return;
+
+    const handler = async (event) => {
+      if (event.type === "run_code") {
+        setIsRunning(true);
+        setOutput(null);
+
+        const result = await executeCode(event.language, event.code);
+
+        channel.sendEvent({
+          type: "run_output",
+          output: result,
+        });
+
+        setIsRunning(false);
+      } 
+      };
+
+      channel.on(handler);
+      return () => channel.off(handler);
+  }, [channel]);
+
+  useEffect(() => {
+    if (!channel) return;
+
+    const handler = (event) => {
+      if (event.type === "run_output") {
+        setOutput(event.output);
+      }
+    };
+
+    channel.on(handler);
+    return () => channel.off(handler);
+  }, [channel]);
+
+
+
+
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
     setSelectedLanguage(newLang);
@@ -77,15 +144,41 @@ const Session = () => {
     const starterCode = problemData?.starterCode?.[newLang] || "";
     setCode(starterCode);
     setOutput(null);
+    if (!channel) return;
+
+    channel.sendEvent({
+      type: "language_changed",
+      language: newLang,
+      code: starterCode,
+    });
   };
 
-  const handleRunCode = async () => {
-    setIsRunning(true);
-    setOutput(null);
+  const handleCodeChange = (value) => {
+    setCode(value);
 
-    const result = await executeCode(selectedLanguage, code);
-    setOutput(result);
-    setIsRunning(false);
+    if (!channel) return;
+
+    channel.sendEvent({
+      type: "code_updated",
+      code: value,
+    });
+  };
+
+
+  const handleRunCode = async () => {
+    // setIsRunning(true);
+    // setOutput(null);
+
+    // const result = await executeCode(selectedLanguage, code);
+    // setOutput(result);
+    // setIsRunning(false);
+    if (!channel) return;
+
+    channel.sendEvent({
+      type: "run_code",
+      code,
+      language: selectedLanguage,
+    });
   };
 
   const handleEndSession = () => {
@@ -237,7 +330,7 @@ const Session = () => {
                       code={code}
                       isRunning={isRunning}
                       onLanguageChange={handleLanguageChange}
-                      onCodeChange={(value) => setCode(value)}
+                      onCodeChange={handleCodeChange}
                       onRunCode={handleRunCode}
                     />
                   </Panel>

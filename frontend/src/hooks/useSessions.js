@@ -3,10 +3,10 @@ import toast from "react-hot-toast"
 import { sessionApi } from "../api/sessions"
 import { useNavigate } from "react-router"
 
-const navigate = useNavigate()
+
 
 export const useCreateSession = () => {
-    
+    const navigate = useNavigate()
     const result = useMutation({
         mutationKey: ["createSession"],
         mutationFn: sessionApi.createSession,

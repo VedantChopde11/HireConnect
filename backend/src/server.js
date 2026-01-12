@@ -23,22 +23,24 @@ const __dirname = path.resolve()
 app.use(express.json())
 // credentials:true meaning?? => server allows a browser to include cookies on request
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://hireconnect-client.onrender.com"
-];
+app.use(clerkMiddleware())  //this adds auth field to request object: req.auth()
+
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://hireconnect-client.onrender.com"
+// ];
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
+  // origin: (origin, callback) => {
+  //   if (!origin) return callback(null, true);
+  //   if (allowedOrigins.includes(origin)) {
+  //     callback(null, true);
+  //   } else {
+  //     callback(new Error("Not allowed by CORS"));
+  //   }
+  origin: true,
   credentials: true
 }));
-app.use(clerkMiddleware())  //this adds auth field to request object: req.auth()
+
 
 // ===== ROUTES =====
 

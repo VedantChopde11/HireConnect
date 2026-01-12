@@ -7,7 +7,8 @@ export const useCreateSession = () => {
         mutationKey: ["createSession"],
         mutationFn: sessionApi.createSession,
         onSuccess: (data) => {
-          setShowCreateModal(false);
+            console.log(data)
+          toast.success("session created successfully!!")
           navigate(`/session/${data.session._id}`);
         },
         onError: (error) => {

@@ -1,15 +1,15 @@
 import axios from "axios"
-import { getAuth } from "@clerk/clerk-react"
+
 
 
 const axiosInstance = axios.create({
     baseURL: `${import.meta.env.VITE_API_URL}/api`,
-    //withCredentials:true // by adding this field browser will send the cookies to server automatically on every single req
+    withCredentials:true // by adding this field browser will send the cookies to server automatically on every single req
 })
 
 axiosInstance.interceptors.request.use(async (config) => {
-  const auth = getAuth();
-  const token = await auth.getToken();
+  // Clerk is injected globally in the browser
+  const token = await window.Clerk?.session?.getToken();
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

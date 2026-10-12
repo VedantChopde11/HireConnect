@@ -7,7 +7,7 @@ import CodeEditorPanel from '../components/CodeEditorPanel'
 import OutputPanel from '../components/OutputPanel'
 import ProblemDescription from '../components/ProblemDescription'
 import toast from 'react-hot-toast'
-import { executeCode } from '../lib/piston'
+import { executeCode } from '../lib/judge0'
 import confetti from "canvas-confetti"
 
 const Problem = () => {

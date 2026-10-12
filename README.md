@@ -1,71 +1,83 @@
 # HireConnect 🚀
 ### Collaborative Coding & Technical Interview Platform
 
-HireConnect is a full-stack web application that simplifies technical interviews by combining interview management, real-time collaborative coding, video communication, and code execution in one platform.
+HireConnect is a full-stack web application that simplifies technical interviews by combining interview management, real-time collaborative coding, video communication, and code execution in one unified platform.
 
-🔗 **Live Demo:** https://hireconnect-client.onrender.com/  
-💻 **GitHub Repository:** https://github.com/VedantChopde11/HireConnect
+🔗 **Live Demo:** [https://hireconnect-client.onrender.com/](https://hireconnect-client.onrender.com/)  
+💻 **GitHub Repository:** [https://github.com/VedantChopde11/HireConnect](https://github.com/VedantChopde11/HireConnect)
+
+---
 
 ## ✨ Features
 
-- **Authentication & Authorization:** Secure user authentication with Clerk and protected application routes.
+- **Authentication & Authorization:** Secure user authentication with Clerk and protected application routes featuring Just-In-Time (JIT) database synchronization.
 - **Role-Based Workflows:** Separate experiences for interviewers and candidates.
-- **Interview Management:** Organize and manage technical interview sessions.
-- **Real-Time Collaborative Coding:** Synchronize code changes between participants using WebSockets.
-- **Video Communication:** Enable interviewers and candidates to communicate during interviews.
-- **Online Code Execution:** Execute code using the Piston API and inspect output and errors.
-- **REST APIs:** Backend endpoints for application functionality and data management.
-- **Database Integration:** Persist application data using MongoDB.
-- **Responsive Interface:** User interface built with React and modern styling tools.
+- **Interview Management:** Organize and manage live technical interview sessions with room status tracking and 5-second polling.
+- **Real-Time Collaborative Coding:** Synchronize code changes between participants inside Monaco Editor with 300ms debouncing and self-event filtering to prevent cursor disruption.
+- **HD Video Communication:** Low-latency WebRTC video and audio conferencing powered by Stream's Selective Forwarding Unit (SFU) with adaptive bitrate.
+- **Online Code Execution:** Execute code securely across multiple languages (C++, Python, Java, JavaScript) using the **Judge0 CE API** inside containerized Linux sandboxes with real-time compilation diagnostics.
+- **REST APIs:** Express 5 backend endpoints for session orchestration, Stream JWT minting, and data persistence.
+- **Database Integration:** Scalable document persistence using MongoDB Atlas with Mongoose schema relationships and indexing.
+- **Responsive Interface:** Modern, accessible user interface built with React 19, Tailwind CSS, DaisyUI, and resizable layout panels.
+
+---
 
 ## 🛠️ Tech Stack
 
 | Category | Technologies |
 |---|---|
-| Frontend | React.js, JavaScript |
-| Styling | Tailwind CSS, Shadcn/UI, Lucide React |
-| Backend | Node.js, Express.js |
-| Database | MongoDB |
-| Authentication | Clerk |
-| Real-Time Communication | WebSockets |
-| Video / Communication | Stream, where configured |
-| Code Execution | Piston API |
-| Background Workflows | Inngest, where configured |
-| Deployment | Render |
+| **Frontend** | React 19, JavaScript, Vite |
+| **Styling** | Tailwind CSS, DaisyUI, Lucide React |
+| **Code Editor** | Monaco Editor (`@monaco-editor/react`), `react-resizable-panels` |
+| **Backend** | Node.js, Express 5 |
+| **Database** | MongoDB Atlas, Mongoose ODM |
+| **Authentication** | Clerk (`@clerk/clerk-react`, `@clerk/express`) |
+| **Real-Time Communication** | Stream.io (WebRTC SFU Video & Chat Event Bus) |
+| **Code Execution** | **Judge0 CE API** (Containerized Linux Sandboxes) |
+| **Background Workflows** | Inngest (Serverless event-driven sync) |
+| **Deployment** | Render (Static Site + Web Service) |
+
+---
 
 ## 🏗️ Application Architecture
 
 ```text
-                   ┌────────────────────┐
-                   │   React Frontend   │
-                   └─────────┬──────────┘
-                             │
-                  ┌──────────┴──────────┐
-                  │                     │
-             REST APIs             WebSockets
-                  │                     │
-                  ▼                     ▼
-          ┌───────────────┐    ┌─────────────────┐
-          │ Express /     │    │ Real-Time Code  │
-          │ Node.js       │    │ Synchronization │
-          └───────┬───────┘    └─────────────────┘
+                   ┌───────────────────────────────────┐
+                   │     React 19 Frontend (Vite)      │
+                   │  - Monaco Editor  - Stream Video  │
+                   └─────────────────┬─────────────────┘
+                                     │
+                  ┌──────────────────┼──────────────────┐
+                  │                  │                  │
+             REST API Calls     JWT Bearer        WebRTC & Events
+                  │                  │                  │
+                  ▼                  ▼                  ▼
+          ┌───────────────┐  ┌───────────────┐  ┌────────────────┐
+          │ Express 5 /   │  │ Clerk Auth    │  │ Stream.io Cloud│
+          │ Node.js       │  │ Short-lived   │  │ - Video SFU    │
+          │ JIT Sync      │  │ RS256 JWTs    │  │ - Event Bus    │
+          └───────┬───────┘  └───────────────┘  └────────────────┘
                   │
            ┌──────┴──────┐
            │             │
            ▼             ▼
-       MongoDB      External APIs
-                    Clerk / Piston /
-                    Communication
+       MongoDB       Judge0 CE API
+       Atlas         Sandboxed Execution
+                     (C++, Py, Java, JS)
 ```
+
+---
 
 ## 🔄 How It Works
 
-1. Users authenticate and access their respective application workflows.
-2. Interviewers organize interview sessions and candidates access their interviews.
-3. Participants join the interview environment.
-4. Code changes are synchronized between participants in real time.
-5. Participants execute code and review the output or errors.
-6. Interview-related workflows are managed through the application.
+1. **Authentication:** Users authenticate via Clerk. The backend's `protectRoute` middleware uses a Just-In-Time (JIT) pattern to ensure user accounts are provisioned in MongoDB and Stream Chat.
+2. **Session Creation:** Interviewers create an interview session with a chosen coding challenge and difficulty.
+3. **Joining the Room:** Both participants join the session room, automatically connecting to the WebRTC video call and the synchronized chat channel.
+4. **Collaborative Pair Programming:** Changes made in Monaco Editor are debounced and broadcast via custom channel events without causing typing lag or cursor displacement.
+5. **Code Execution:** Participants execute code via the **Judge0 CE API** (`https://ce.judge0.com`), receiving real-time stdout, stderr, execution time, and automated test-case evaluation.
+6. **Session Termination:** The host ends the session, which cleans up active video/audio hardware tracks and updates room status in MongoDB.
+
+---
 
 ## 📁 Project Structure
 
@@ -73,27 +85,36 @@ HireConnect is a full-stack web application that simplifies technical interviews
 HireConnect/
 ├── frontend/
 │   ├── src/
+│   │   ├── components/      # UI components (Navbar, VideoCallUI, CodeEditorPanel, etc.)
+│   │   ├── hooks/           # Custom hooks (useStreamClient, useSessions)
+│   │   ├── lib/             # Utilities (judge0.js, axios.js, utils.js)
+│   │   ├── pages/           # Pages (Dashboard, Session, Problem)
+│   │   └── data/            # Problem definitions and starter code
 │   └── package.json
 ├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── models/
+│   ├── src/
+│   │   ├── controllers/     # Route logic (sessionControllers, chatController)
+│   │   ├── middleware/      # Authentication & JIT sync (protectRoute)
+│   │   ├── models/          # Mongoose models (User, Session)
+│   │   ├── routes/          # API endpoints (sessionRoutes, chatRoutes)
+│   │   ├── lib/             # Configuration (db, env, inngest, stream)
+│   │   └── server.js        # Express 5 application entrypoint
 │   └── package.json
 ├── package.json
 ├── .gitignore
 └── README.md
 ```
 
-*Note: The structure above is illustrative. Update it to match the actual directories and files in your repository.*
+---
 
 ## ⚙️ Getting Started
 
 ### Prerequisites
 
-- Node.js and npm
-- MongoDB Atlas or a local MongoDB instance
-- Clerk account and application credentials
-- API credentials for any external services used by your configuration
+- Node.js (v18+ recommended) and npm
+- MongoDB Atlas account (or local MongoDB)
+- Clerk account and API credentials
+- Stream.io account and API credentials
 
 ### 1. Clone the repository
 
@@ -102,89 +123,74 @@ git clone https://github.com/VedantChopde11/HireConnect.git
 cd HireConnect
 ```
 
-### 2. Install frontend dependencies
+### 2. Configure Environment Variables
 
-```bash
-cd frontend
-npm install
+#### Frontend (`frontend/.env`)
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+VITE_STREAM_API_KEY=your_stream_api_key
 ```
 
-Create a frontend `.env` file with the required environment variables.
+#### Backend (`backend/.env`)
+```env
+PORT=5000
+NODE_ENV=development
+MONGO_URI=your_mongodb_connection_string
+CLIENT_URL=http://localhost:5173
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+STREAM_API_KEY=your_stream_api_key
+STREAM_API_SECRET=your_stream_api_secret
+INNGEST_SIGNING_KEY=your_inngest_signing_key
+INNGEST_EVENT_KEY=your_inngest_event_key
+```
 
-Start the frontend using the development script defined in `frontend/package.json`, for example:
+### 3. Install Dependencies & Run
 
+#### Backend:
 ```bash
+cd backend
+npm install
 npm run dev
 ```
 
-### 3. Install backend dependencies
-
-Open a new terminal:
-
+#### Frontend:
 ```bash
-cd HireConnect/backend
+cd ../frontend
 npm install
-```
-
-Create a backend `.env` file with the required configuration.
-
-Start the backend using the script defined in `backend/package.json`, for example:
-
-```bash
 npm run dev
 ```
 
-Use the actual scripts configured in your repository if they differ from these examples.
+The application will be accessible at `http://localhost:5173`.
 
-### 4. Configure environment variables
+---
 
-Create the environment files required by your frontend and backend.
+## 🔐 Security & Sandboxing
 
-Typical configuration may include:
+- **Zero Host Execution:** Candidate code is executed strictly within isolated, ephemeral Linux containers via **Judge0 CE** (128MB RAM, 5s CPU limit) rather than using dangerous local `child_process.exec()` calls.
+- **JWT Authentication:** Cryptographically verified Clerk session tokens are validated on protected API endpoints.
+- **Hardware Lifecycle Management:** Media tracks and WebRTC connections are terminated upon leaving a session to prevent camera/microphone resource leaks.
+- **Idempotent Background Jobs:** Inngest handlers use MongoDB upserts (`findOneAndUpdate`) to prevent race conditions and duplicate key errors.
 
-**Frontend**
-- API base URL
-- Clerk publishable key
-- Public communication-service API key, if required
-
-**Backend**
-- Port
-- MongoDB connection string
-- Clerk secret key
-- Communication-service credentials
-- Code-execution configuration
-- Background workflow credentials, if applicable
-
-Refer to your source code for the exact variable names. Never commit real secrets or credentials to GitHub.
-
-## 🔐 Security
-
-- Keep private API keys and database credentials on the backend.
-- Validate incoming API requests.
-- Enforce server-side authorization for protected operations.
-- Restrict access to interview sessions.
-- Apply appropriate timeouts and resource limits to code execution.
-- Store only the data necessary for the application's functionality.
+---
 
 ## 🚀 Future Improvements
 
-- Coding-question library with automated test cases.
-- Interview feedback and evaluation system.
-- Code history and session recovery.
-- Interview reminders and calendar integration.
-- Automated testing and CI/CD.
-- Interview analytics dashboard.
-- AI-assisted interview summaries.
+- Integrated CRDTs (Yjs) for character-level simultaneous multi-cursor editing.
+- Automated session cloud recording exports to AWS S3.
+- Pre-call hardware testing screen (microphone, speaker, and camera diagnostics).
+- AI-assisted interview summary and candidate feedback generation.
+
+---
 
 ## 👨‍💻 Author
 
 **Vedant Chopde**  
-Engineering Student | Full-Stack Developer
-
-- GitHub: https://github.com/VedantChopde11
-- Project Repository: https://github.com/VedantChopde11/HireConnect
+Engineering Student | Full-Stack Developer  
+- GitHub: [https://github.com/VedantChopde11](https://github.com/VedantChopde11)  
+- Project Repository: [https://github.com/VedantChopde11/HireConnect](https://github.com/VedantChopde11/HireConnect)
 
 ---
 
-⭐ If you find this project interesting, consider starring the repository!
-
+⭐ *If you find this project helpful, consider starring the repository!*

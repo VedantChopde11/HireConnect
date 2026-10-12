@@ -9,9 +9,9 @@ export async function getStreamToken(req,res) {
             token,
             userId: req.user.clerkId,
             userName: req.user.name,
-            userImage: req.user.image
+            userImage: req.user.profileImage || req.user.image || ""
         })
     } catch (error) {
-        res.status(500).json({msg:"Internal Server Error"})
+        res.status(500).json({msg:"Internal Server Error", message: "Internal Server Error"})
     }
 }

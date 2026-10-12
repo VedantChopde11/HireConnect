@@ -1,3 +1,8 @@
 node_modules
 .env
 .DS_Store
+
+# Interview & Architectural Guides (Internal Prep)
+HIRECONNECT_COMPLETE_GUIDE.md
+HIRECONNECT_COMPLETE_INTERVIEW_GUIDE.txt
+HIRECONNECT_COMPLETE_INTERVIEW_GUIDE.pdf

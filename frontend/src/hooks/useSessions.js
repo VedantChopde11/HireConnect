@@ -11,21 +11,15 @@ export const useCreateSession = () => {
         mutationKey: ["createSession"],
         mutationFn: sessionApi.createSession,
         onSuccess: (data) => {
-            console.log(data)
-          toast.success("session created successfully!!")
+          toast.success("Session created successfully!")
           navigate(`/session/${data.session._id}`);
         },
         onError: (error) => {
-             console.log(error)
+            console.error("Create session error:", error)
             toast.error(
-           
-                error.response?.data?.message || "Failed to create room"
-          
-        )}
-
-        
-        
-        
+                error.response?.data?.message || error.response?.data?.msg || "Failed to create room"
+            )
+        }
     })
     return result
 }
@@ -34,6 +28,7 @@ export const useActiveSessions = () => {
     const result = useQuery({
         queryKey: ["activeSession"],
         queryFn: sessionApi.getActiveSessions,
+        retry: 1,
     })
     return result
 }
@@ -42,6 +37,7 @@ export const useMyRecentSessions = () => {
     const result = useQuery({
         queryKey: ["myRecentSessions"],
         queryFn: sessionApi.getMyRecentSessions,
+        retry: 1,
     })
     return result
 }
@@ -51,7 +47,7 @@ export const useSessionById = (id) => {
         queryKey: ["session" , id],
         queryFn: () => sessionApi.getSessionById(id),
         enabled: !!id,
-        refetchInterval:5000, //refetch every 5 seconds to defect session status changes
+        refetchInterval: 5000, // refetch every 5 seconds to detect session status changes
     })
     return result
 }
@@ -61,7 +57,7 @@ export const useJoinSession = () => {
         mutationKey: ["joinSession"],
         mutationFn: sessionApi.joinSession,
         onSuccess: () => toast.success("Joined session successfully!"),
-        onError: (error) => toast.error(error.response?.data?.message || 'Failed to join session')
+        onError: (error) => toast.error(error.response?.data?.message || error.response?.data?.msg || 'Failed to join session')
     })
     return result
 }
@@ -71,7 +67,7 @@ export const useEndSession = () => {
         mutationKey: ["endSession"],
         mutationFn: sessionApi.endSession,
         onSuccess: () => toast.success("Ended session successfully!"),
-        onError: (error) => toast.error(error.response?.data?.message || 'Failed to join session')
+        onError: (error) => toast.error(error.response?.data?.message || error.response?.data?.msg || 'Failed to end session')
     })
     return result
 }

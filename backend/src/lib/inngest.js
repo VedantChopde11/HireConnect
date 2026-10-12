@@ -16,18 +16,21 @@ const syncUser = inngest.createFunction(
 
         const newUser = {
             clerkId: id,
-            email: email_addresses[0]?.email_address,
-            name: `${first_name||""} ${last_name||""}`,
-            profileImage: image_url
+            email: email_addresses?.[0]?.email_address || "",
+            name: `${first_name||""} ${last_name||""}`.trim() || "User",
+            profileImage: image_url || ""
         }
 
-        await User.create(newUser)
+        await User.findOneAndUpdate(
+            { clerkId: newUser.clerkId },
+            newUser,
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        )
 
         await upsertStreamUser({
             id: newUser.clerkId.toString(),
-            name:newUser.name,
+            name: newUser.name,
             image: newUser.profileImage
-
         })
     }
 )

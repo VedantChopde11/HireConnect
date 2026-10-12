@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/clerk-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useEndSession, useJoinSession, useSessionById } from "../hooks/useSessions";
 import { PROBLEMS } from "../data/problems";
@@ -70,72 +70,59 @@ const Session = () => {
     }
   }, [problemData, selectedLanguage]);
 
-  useEffect(() => {
-    if (!channel) return;
+  const debounceTimerRef = useRef(null);
+  const lastBroadcastCodeRef = useRef(code);
 
-    const handler = (event) => {
-      if (event.type === "code_updated") {
-        setCode(event.code);
+  // Clean up debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
       }
     };
+  }, []);
 
-    channel.on(handler);
-    return () => channel.off(handler);
-  }, [channel]);
-
+  // Listen to remote real-time events on the Stream channel
   useEffect(() => {
     if (!channel) return;
 
     const handler = (event) => {
-      if (event.type === "language_changed") {
+      const isSelf = event.senderId === user?.id || event.user?.id === user?.id;
+
+      if (event.type === "code_updated") {
+        // Ignore events sent by ourselves to prevent cursor jumping and typing lag
+        if (isSelf) return;
+
+        setCode((prev) => {
+          if (prev !== event.code) {
+            lastBroadcastCodeRef.current = event.code;
+            return event.code;
+          }
+          return prev;
+        });
+      } else if (event.type === "language_changed") {
+        if (isSelf) return;
+
         setSelectedLanguage(event.language);
         setCode(event.code);
+        lastBroadcastCodeRef.current = event.code;
         setOutput(null);
-      }
-    };
+      } else if (event.type === "run_started") {
+        if (isSelf) return;
 
-    channel.on(handler);
-    return () => channel.off(handler);
-  }, [channel]);
-
-  useEffect(() => {
-    if (!channel) return;
-
-    const handler = async (event) => {
-      if (event.type === "run_code") {
         setIsRunning(true);
         setOutput(null);
+      } else if (event.type === "run_output") {
+        if (isSelf) return;
 
-        const result = await executeCode(event.language, event.code);
-
-        channel.sendEvent({
-          type: "run_output",
-          output: result,
-        });
-
-        setIsRunning(false);
-      } 
-      };
-
-      channel.on(handler);
-      return () => channel.off(handler);
-  }, [channel]);
-
-  useEffect(() => {
-    if (!channel) return;
-
-    const handler = (event) => {
-      if (event.type === "run_output") {
         setOutput(event.output);
+        setIsRunning(false);
       }
     };
 
     channel.on(handler);
     return () => channel.off(handler);
-  }, [channel]);
-
-
-
+  }, [channel, user?.id]);
 
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
@@ -143,42 +130,68 @@ const Session = () => {
     // use problem-specific starter code
     const starterCode = problemData?.starterCode?.[newLang] || "";
     setCode(starterCode);
+    lastBroadcastCodeRef.current = starterCode;
     setOutput(null);
+
     if (!channel) return;
 
     channel.sendEvent({
       type: "language_changed",
       language: newLang,
       code: starterCode,
+      senderId: user?.id,
     });
   };
 
   const handleCodeChange = (value) => {
+    // Immediate local state update for zero-lag smooth 60fps typing
     setCode(value);
 
     if (!channel) return;
 
-    channel.sendEvent({
-      type: "code_updated",
-      code: value,
-    });
+    // Debounce broadcasting to peer by 300ms to avoid flooding network on every keypress
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      if (lastBroadcastCodeRef.current !== value) {
+        lastBroadcastCodeRef.current = value;
+        channel.sendEvent({
+          type: "code_updated",
+          code: value,
+          senderId: user?.id,
+        });
+      }
+    }, 300);
   };
 
-
   const handleRunCode = async () => {
-    // setIsRunning(true);
-    // setOutput(null);
+    if (isRunning) return;
+    setIsRunning(true);
+    setOutput(null);
 
-    // const result = await executeCode(selectedLanguage, code);
-    // setOutput(result);
-    // setIsRunning(false);
-    if (!channel) return;
+    // Notify peer that code execution has started
+    if (channel) {
+      channel.sendEvent({
+        type: "run_started",
+        senderId: user?.id,
+      });
+    }
 
-    channel.sendEvent({
-      type: "run_code",
-      code,
-      language: selectedLanguage,
-    });
+    // Execute code via Judge0 CE
+    const result = await executeCode(selectedLanguage, code);
+    setOutput(result);
+    setIsRunning(false);
+
+    // Broadcast output to peer
+    if (channel) {
+      channel.sendEvent({
+        type: "run_output",
+        output: result,
+        senderId: user?.id,
+      });
+    }
   };
 
   const handleEndSession = () => {

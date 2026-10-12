@@ -31,16 +31,10 @@ const Dashboard = () => {
         difficulty: roomConfig.difficulty.toLowerCase(),
       },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           setShowCreateModal(false);
-          navigate(`/session/${data.session._id}`);
         },
-        onError: (error) => {
-        toast.error(
-          error.response?.data?.message || "Failed to create room"
-        )}
-        
-      },
+      }
     );
   };
 
@@ -48,7 +42,7 @@ const Dashboard = () => {
   const recentSessions = recentSessionsData?.sessions || [];
 
   const isUserInSession = (session) => {
-    if (!user.id) return false;
+    if (!user?.id) return false;
 
     return session.host?.clerkId === user.id || session.participant?.clerkId === user.id;
   };

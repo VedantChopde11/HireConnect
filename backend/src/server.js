@@ -1,7 +1,7 @@
 import express from "express"
 import path from "path"
 import cors from "cors"
-import  {ENV} from "./lib/env.js"
+import { ENV } from "./lib/env.js"
 import fs from "fs"
 import { clerkMiddleware } from '@clerk/express'
 
@@ -28,15 +28,25 @@ app.use(clerkMiddleware())  //this adds auth field to request object: req.auth()
 
 const allowedOrigins = [
   "http://localhost:5173",
-  ENV.CLIENT_URL
+  "http://localhost:5174",
+  "http://localhost:3000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5174",
+  ENV.CLIENT_URL ? ENV.CLIENT_URL.replace(/\/+$/, "") : null
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+
+    const cleanOrigin = origin.replace(/\/+$/, "");
+    const isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(cleanOrigin);
+    const isAllowed = allowedOrigins.includes(cleanOrigin);
+
+    if (isLocalhost || isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, false);
     }
   },
   credentials: true
@@ -45,7 +55,7 @@ app.use(cors({
 
 // ===== ROUTES =====
 
-app.use("/api/inngest" , serve({client: inngest , functions}))
+app.use("/api/inngest", serve({ client: inngest, functions }))
 
 app.get("/api/health", (req, res) => {
     res.status(200).json({ status: "ok", message: "HireConnect backend is running" });
@@ -86,16 +96,14 @@ if (ENV.NODE_ENV === "production") {
     });
 }
 
-// ===== START SERVER =====
-
 const startServer = async () => {
     try {
-       await connectDB()
-       app.listen(ENV.PORT , () => {
-        console.log("connected to the backend at port:",ENV.PORT)
-       })
+        await connectDB()
+        app.listen(ENV.PORT, () => {
+            console.log("connected to the backend at port:", ENV.PORT)
+        })
     } catch (error) {
-        console.error("Database connection failed" , error)
+        console.error("Database connection failed", error)
     }
 }
 

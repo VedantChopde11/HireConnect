@@ -2,6 +2,7 @@ import express from "express"
 import path from "path"
 import cors from "cors"
 import  {ENV} from "./lib/env.js"
+import fs from "fs"
 import { clerkMiddleware } from '@clerk/express'
 
 
@@ -54,9 +55,6 @@ app.get("/api/users/me", protectRoute, (req, res) => {
     res.status(200).json({ user: req.user });
 });
 
-app.get('/', (req, res) => {
-    res.status(200).json({ message: "welcome to backend" });
-});
 
 // when  you pass an array of middleware to Express, it automatically flattens ans executes them sequentially , one by one.
 app.get("/video-calls", protectRoute, (req, res) => {
@@ -68,10 +66,23 @@ app.use("/api/sessions", sessionRoutes);
 
 // make our app ready for deployment 
 if (ENV.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+    const frontendDist = path.join(__dirname, "../frontend/dist");
+    const indexHtml = path.join(frontendDist, "index.html");
 
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    if (fs.existsSync(indexHtml)) {
+        app.use(express.static(frontendDist));
+
+        app.get("{*path}", (req, res) => {
+            res.sendFile(indexHtml);
+        });
+    } else {
+        app.get('/', (req, res) => {
+            res.status(200).json({ message: "welcome to backend" });
+        });
+    }
+} else {
+    app.get('/', (req, res) => {
+        res.status(200).json({ message: "welcome to backend" });
     });
 }
 

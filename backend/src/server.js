@@ -26,19 +26,19 @@ app.use(express.json())
 
 app.use(clerkMiddleware())  //this adds auth field to request object: req.auth()
 
-// const allowedOrigins = [
-//   "http://localhost:5173",
-//   "https://hireconnect-client.onrender.com"
-// ];
+const allowedOrigins = [
+  "http://localhost:5173",
+  ENV.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  // origin: (origin, callback) => {
-  //   if (!origin) return callback(null, true);
-  //   if (allowedOrigins.includes(origin)) {
-  //     callback(null, true);
-  //   } else {
-  //     callback(new Error("Not allowed by CORS"));
-  //   }
-  origin: true,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 

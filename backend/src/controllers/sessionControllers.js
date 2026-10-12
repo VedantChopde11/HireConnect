@@ -98,7 +98,6 @@ export async function getSessionById(req,res) {
 
 export async function joinSession(req,res) {
      try {
-        
         const {id} = req.params
         const userId = req.user._id
         const clerkId = req.user.clerkId
@@ -115,16 +114,28 @@ export async function joinSession(req,res) {
             return res.status(400).json({msg: "Host cannot join their own session as participant", message: "Host cannot join their own session as participant"})
         }
 
-        // check if session is already full - has a participant
-        if(session.participant) return res.status(409).json({msg: "Session is full", message: "Session is full"})
+        // If the user is already the participant (e.g. reconnect or page reload), allow idempotent success
+        if (session.participant && session.participant.toString() === userId.toString()) {
+            const channel = chatClient.channel("messaging", session.callId)
+            await channel.addMembers([clerkId])
+            return res.status(200).json({ session })
+        }
 
-        session.participant = userId
-        await session.save()
+        // Atomically assign the participant slot to avoid race conditions
+        const updatedSession = await Session.findOneAndUpdate(
+            { _id: id, status: "active", participant: null },
+            { participant: userId },
+            { new: true }
+        )
 
-        const channel = chatClient.channel("messaging" , session.callId)
+        if (!updatedSession) {
+            return res.status(409).json({msg: "Session is full", message: "Session is full"})
+        }
+
+        const channel = chatClient.channel("messaging", session.callId)
         await channel.addMembers([clerkId])
 
-        res.status(200).json({session})
+        res.status(200).json({session: updatedSession})
 
      } catch (error) {
         console.error("Error in joinSession controller: ", error.message)
